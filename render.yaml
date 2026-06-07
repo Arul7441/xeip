@@ -1,0 +1,12 @@
+# Render Blueprint — one-click deploy of the XEIP API.
+# In Render: New + > Blueprint > connect this repo. Render reads this file,
+# builds the Dockerfile, and gives you a public HTTPS URL.
+services:
+  - type: web
+    name: xeip-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true

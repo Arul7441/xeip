@@ -1,0 +1,8 @@
+# Production runtime dependencies for the XEIP API container.
+# The app only uses FastAPI + Pydantic + JWT; the heavy data-science libs in
+# requirements.txt (numpy/pandas/scikit-learn) and dev tools (pytest/httpx)
+# are intentionally excluded to keep the image small and the build fast.
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+python-jose[cryptography]==3.3.0

@@ -654,7 +654,14 @@
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-const API = 'http://localhost:8081';
+// API endpoint resolves automatically:
+//   • opened locally (file:// or localhost)  -> local uvicorn on :8081
+//   • served from GitHub Pages / anywhere     -> HOSTED_API below
+//   • override anytime with ?api=https://...  (handy for testing)
+// After deploying to Render, paste your service URL into HOSTED_API.
+const HOSTED_API = 'https://xeip-api.onrender.com';
+const _isLocal = ['localhost', '127.0.0.1', ''].includes(location.hostname) || location.protocol === 'file:';
+const API = new URLSearchParams(location.search).get('api') || (_isLocal ? 'http://localhost:8081' : HOSTED_API);
 let currentRole = 'executive';
 let currentTab = 'overview';
 
