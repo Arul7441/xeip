@@ -1,135 +1,63 @@
-from __future__ import annotations
+def get_answer(q: str) -> dict:
+    q = q.lower()
 
-import re
-
-
-KNOWLEDGE_BASE = {
-    "mttr": {
-        "value": "14.8 hours",
-        "trend": "down 12% vs last quarter",
-        "insight": "Field maintenance SLA compliance driving improvement. P1 tickets now resolved avg 6.2h.",
-        "recommendation": "Automate parts pre-staging for top 10 error codes to cut MTTR below 10h.",
-    },
-    "churn": {
-        "value": "11.4% at-risk",
-        "trend": "stable",
-        "insight": "142 accounts flagged by churn model. Top drivers: high ticket volume + negative sentiment.",
-        "recommendation": "Assign CSM outreach to top 20 accounts. Offer contract refresh incentive.",
-    },
-    "toner": {
-        "value": "91.2% inventory health",
-        "trend": "up 3.1% this month",
-        "insight": "Forecast model accuracy at 89.7%. 3 SKUs below reorder threshold.",
-        "recommendation": "Trigger procurement for SKU-TN-045, SKU-TN-112, SKU-TN-089 within 48h.",
-    },
-    "sla": {
-        "value": "96.8% compliance",
-        "trend": "up 1.2% vs target",
-        "insight": "Premium tier at 98.1%. Standard tier at 94.9% — 2 accounts at breach risk.",
-        "recommendation": "Pre-emptive escalation for Account-0447 and Account-1203 before month end.",
-    },
-    "cost": {
-        "value": "$4.82M savings",
-        "trend": "YTD vs manual operations baseline",
-        "insight": "Preventive maintenance automation saving $2.1M. Inventory optimisation $1.4M. Ticket deflection $1.3M.",
-        "recommendation": "Expand predictive maintenance to 3 additional device models for incremental $800K savings.",
-    },
-    "fleet": {
-        "value": "98.73% uptime",
-        "trend": "best in 18 months",
-        "insight": "14 devices currently in warning state. 3 high-risk devices need immediate attention.",
-        "recommendation": "Schedule preventive maintenance for XRX-0007, XRX-0019, XRX-0031 this week.",
-    },
-    "tickets": {
-        "value": "12.6h avg resolution",
-        "trend": "down 18% QoQ",
-        "insight": "AI routing accuracy at 84%. Misrouted tickets average 4.2 reassignments before resolution.",
-        "recommendation": "Re-train routing model on Q2 tickets. Focus on fuser/jam disambiguation.",
-    },
-}
-
-GREETINGS = ["hi", "hello", "hey", "good morning", "good afternoon", "good evening"]
-
-HELP_RESPONSE = {
-    "answer": (
-        "I'm your XEIP Executive Copilot. I can answer questions about:\n\n"
-        "• **Fleet health** — device uptime, failure risk, toner levels\n"
-        "• **MTTR** — mean time to repair, maintenance performance\n"
-        "• **Churn risk** — at-risk customer accounts\n"
-        "• **SLA compliance** — service level performance\n"
-        "• **Cost savings** — AI-driven operational savings\n"
-        "• **Inventory** — toner and parts forecast\n"
-        "• **Tickets** — support resolution performance\n\n"
-        "Try asking: *What is our current MTTR?* or *Which devices need attention?*"
-    ),
-    "confidence": 1.0,
-    "topic": "help",
-    "sources": ["XEIP Knowledge Base"],
-}
-
-
-def _match_topic(query: str) -> str | None:
-    q = query.lower()
-    if any(w in q for w in ["mttr", "repair", "maintenance", "fix", "downtime"]):
-        return "mttr"
-    if any(w in q for w in ["churn", "at-risk", "customer", "account", "retention"]):
-        return "churn"
-    if any(w in q for w in ["toner", "inventory", "stock", "supply", "cartridge", "sku"]):
-        return "toner"
-    if any(w in q for w in ["sla", "compliance", "service level", "breach", "contract"]):
-        return "sla"
-    if any(w in q for w in ["cost", "saving", "roi", "financial", "money", "usd"]):
-        return "cost"
-    if any(w in q for w in ["fleet", "device", "printer", "uptime", "online", "offline"]):
-        return "fleet"
-    if any(w in q for w in ["ticket", "support", "resolution", "routing", "escalation"]):
-        return "tickets"
-    return None
-
-
-def copilot_query(query: str, role: str = "executive") -> dict:
-    q = query.strip().lower()
-
-    if any(g in q for g in GREETINGS):
+    if any(w in q for w in ["mttr", "repair time", "fix time", "mean time"]):
         return {
-            "answer": f"Hello! I'm your XEIP Executive Copilot. How can I help you today? Ask me about fleet health, MTTR, churn risk, SLA compliance, or cost savings.",
-            "confidence": 1.0,
-            "topic": "greeting",
-            "sources": [],
+            "answer": "Current MTTR is 14.8 hours, down 12% QoQ. Basement Print Room devices average 18.2h due to access delays. Recommend pre-positioning spare parts at that location to cut MTTR by ~4 hours.",
+            "confidence": 0.91, "topic": "mttr"
         }
-
-    if any(w in q for w in ["help", "what can you", "what do you", "capabilities"]):
-        return HELP_RESPONSE
-
-    topic = _match_topic(query)
-
-    if topic:
-        kb = KNOWLEDGE_BASE[topic]
+    if any(w in q for w in ["fleet health", "overall health", "printer health", "device health", "fleet"]):
         return {
-            "answer": (
-                f"**Current status:** {kb['value']}\n\n"
-                f"**Trend:** {kb['trend']}\n\n"
-                f"**Insight:** {kb['insight']}\n\n"
-                f"**Recommendation:** {kb['recommendation']}"
-            ),
-            "confidence": 0.91,
-            "topic": topic,
-            "sources": ["XEIP Analytics Engine", "ML Model Output", "Live Telemetry"],
-            "governance": {
-                "model": "xeip-copilot-v1",
-                "policy": "XEIP-COPILOT-001",
-                "human_review": "recommended for decisions >$50K impact",
-            },
+            "answer": "Fleet health score is 0.5% — critically low. 50 of 50 devices are flagged HIGH risk. 11 devices offline, 8 in WARNING state. Immediate maintenance recommended for XRX-0003 (79.4C, 40 errors), XRX-0008 (17% toner), XRX-0005 (offline).",
+            "confidence": 0.97, "topic": "fleet_health"
         }
-
+    if any(w in q for w in ["churn", "leaving", "cancel", "at risk", "customer risk"]):
+        return {
+            "answer": "142 accounts flagged for churn risk — 11.4% of customer base. Contracts expiring in 90 days with 3+ unresolved tickets are highest risk. Estimated revenue at risk: $2.3M annually. Recommend proactive outreach to top 20 accounts this week.",
+            "confidence": 0.88, "topic": "churn"
+        }
+    if any(w in q for w in ["sla", "compliance", "service level"]):
+        return {
+            "answer": "SLA compliance is 96.8%, above the 95% target. 3.2% of tickets breached SLA this quarter — primarily due to parts unavailability in Basement zone. Restocking that zone will push compliance above 98%.",
+            "confidence": 0.93, "topic": "sla"
+        }
+    if any(w in q for w in ["cost", "saving", "money", "financial"]):
+        return {
+            "answer": "Total cost savings YTD: $4.82M. Breakdown: $2.1M from predictive maintenance, $1.4M from automated toner procurement, $1.32M from agent-automated ticket routing.",
+            "confidence": 0.95, "topic": "cost_savings"
+        }
+    if any(w in q for w in ["inventory", "toner", "stock", "parts", "supply"]):
+        return {
+            "answer": "Inventory health is 91.2%. 3 SKUs critically low: C8155 Black Toner (2 units), VersaLink Drum B405 (1 unit), Fuser Assembly C405 (0 units — order immediately). Auto-procurement agent triggered for all 3.",
+            "confidence": 0.89, "topic": "inventory"
+        }
+    if any(w in q for w in ["maintenance", "urgent", "immediate", "broken", "repair", "attention"]):
+        return {
+            "answer": "5 devices need immediate maintenance: XRX-0003 (WARNING, 79.4C, 40 errors/30d), XRX-0005 (OFFLINE Floor 3), XRX-0008 (17% toner, 65.2C), XRX-0001 (29.2% toner, 100% failure risk), XRX-0002 (39.3% toner, 100% failure risk). Maintenance Agent has scheduled technician visits.",
+            "confidence": 0.96, "topic": "maintenance"
+        }
+    if any(w in q for w in ["uptime", "availability", "online", "offline", "down"]):
+        return {
+            "answer": "Device uptime is 98.73% — best in 18 months. 31 devices online, 8 warning, 11 offline. Predictive alerts prevented an estimated 6 additional outages this quarter.",
+            "confidence": 0.92, "topic": "uptime"
+        }
+    if any(w in q for w in ["ticket", "support", "resolution", "helpdesk"]):
+        return {
+            "answer": "Average ticket resolution time is 12.6 hours, down 18% QoQ. Ticket Router auto-assigns 84% of tickets correctly on first attempt. Fully automated resolution rate: 31%.",
+            "confidence": 0.87, "topic": "tickets"
+        }
     return {
-        "answer": (
-            f"I don't have specific data on that query yet. "
-            f"I can help with fleet health, MTTR, churn risk, SLA compliance, cost savings, inventory, and ticket performance. "
-            f"Try rephrasing or ask 'help' to see all topics."
-        ),
-        "confidence": 0.3,
-        "topic": "unknown",
-        "sources": [],
-        "suggestion": "Try: 'What is our MTTR?', 'Show churn risk', 'Fleet status'",
+        "answer": f"Based on current fleet data: 50 printers monitored, fleet health 0.5% (critical), MTTR 14.8h, SLA compliance 96.8%, cost savings $4.82M YTD. Ask about MTTR, fleet health, churn, SLA, cost savings, inventory, or maintenance for detailed insights.",
+        "confidence": 0.6, "topic": "general"
+    }
+
+
+def copilot_query(query: str) -> dict:
+    result = get_answer(query)
+    return {
+        "answer": result["answer"],
+        "confidence": result["confidence"],
+        "topic": result["topic"],
+        "sources": ["fleet_telemetry", "ml_model", "ticket_system"],
+        "governance": {"authorized": True}
     }

@@ -80,3 +80,16 @@ class WorkOrderRequest(BaseModel):
     issue: str = Field(..., min_length=8, max_length=1000)
     priority: Literal["P1", "P2", "P3", "P4"] = "P3"
     governance: GovernanceEnvelope
+
+class CopilotQuery(BaseModel):
+    query: str = Field(..., min_length=3, max_length=2000)
+    governance: GovernanceEnvelope
+
+class CopilotQuery(BaseModel):
+    query: str = Field(..., min_length=3, max_length=2000)
+    governance: GovernanceEnvelope
+
+class User(BaseModel):
+    sub: str
+    role: str
+    tenant_id: str

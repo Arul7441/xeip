@@ -221,4 +221,4 @@ class CopilotRequest(BaseModel):
 def copilot(payload: CopilotRequest, user: User = Depends(get_current_user)):
     """Executive AI Copilot — natural language queries about fleet, SLA, churn, costs."""
     enforce_tenant_scope(user, payload.governance.tenant_id)
-    return copilot_query(payload.query, role=user.role)
+    return copilot_query(payload.query)
