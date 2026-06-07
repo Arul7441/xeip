@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import Depends, FastAPI, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from . import analytics
@@ -50,6 +50,33 @@ async def value_error_handler(_: Request, exc: ValueError):
 
 
 # ── Core ──────────────────────────────────────────────────────────────────────
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return """<!doctype html><html><head><meta charset="utf-8">
+<title>XEIP API</title>
+<style>body{font-family:system-ui,sans-serif;background:#0a0c10;color:#e6e8eb;
+display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}
+.card{max-width:560px;padding:40px;text-align:center}
+.mark{display:inline-block;background:#e8173a;color:#fff;font-weight:700;
+padding:6px 12px;border-radius:8px;font-size:20px}
+h1{font-weight:600;margin:18px 0 6px}p{color:#8b929c;line-height:1.6}
+a{display:inline-block;margin:8px;padding:10px 18px;border-radius:8px;
+background:#1a1d24;color:#e6e8eb;text-decoration:none;border:1px solid #2a2e37}
+a:hover{border-color:#e8173a}.ok{color:#22c55e}</style></head>
+<body><div class="card">
+<span class="mark">XEIP</span>
+<h1>Enterprise Intelligence API <span class="ok">&#9679; live</span></h1>
+<p>This is the backend API. It serves data to the XEIP dashboard.<br>
+Pick a destination below.</p>
+<div>
+<a href="https://arul7441.github.io/xeip/">Open Dashboard</a>
+<a href="/docs">API Explorer (/docs)</a>
+<a href="/health">Health Check</a>
+</div>
+<p style="margin-top:24px;font-size:12px">v2.0.0 &middot; FastAPI &middot; governed by XEIP-AUTONOMY-001</p>
+</div></body></html>"""
+
 
 @app.get("/health")
 def health():
