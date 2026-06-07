@@ -1,0 +1,15 @@
+﻿
+backend/.venv/
+
+__pycache__/
+
+*.pyc
+
+.DS_Store
+
+node_modules/
+
+*.egg-info/
+
+backend/test.json
+

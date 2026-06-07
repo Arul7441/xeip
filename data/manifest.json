@@ -1,0 +1,253 @@
+{
+  "generated_at": "2026-06-07T12:07:20Z",
+  "dataset_count": 15,
+  "total_records": 75015,
+  "datasets": {
+    "printer_telemetry": {
+      "path": "data\\printer_telemetry.csv",
+      "records": 5001,
+      "fields": [
+        "event_id",
+        "timestamp",
+        "device_id",
+        "customer",
+        "region",
+        "model",
+        "temperature_c",
+        "humidity_pct",
+        "usage_count",
+        "paper_jam_rate",
+        "toner_level_pct",
+        "error_frequency",
+        "anomaly_flag"
+      ]
+    },
+    "toner_usage": {
+      "path": "data\\toner_usage.csv",
+      "records": 5001,
+      "fields": [
+        "usage_id",
+        "timestamp",
+        "device_id",
+        "customer",
+        "cartridge_type",
+        "pages_printed",
+        "toner_consumed_ml",
+        "remaining_pct",
+        "replacement_required"
+      ]
+    },
+    "maintenance_logs": {
+      "path": "data\\maintenance_logs.csv",
+      "records": 5001,
+      "fields": [
+        "maintenance_id",
+        "timestamp",
+        "device_id",
+        "technician_id",
+        "maintenance_type",
+        "parts_replaced",
+        "downtime_minutes",
+        "cost_usd",
+        "maintenance_history_score",
+        "notes"
+      ]
+    },
+    "device_error_logs": {
+      "path": "data\\device_error_logs.csv",
+      "records": 5001,
+      "fields": [
+        "error_id",
+        "timestamp",
+        "device_id",
+        "error_code",
+        "severity",
+        "subsystem",
+        "auto_recovered",
+        "error_duration_sec"
+      ]
+    },
+    "service_tickets": {
+      "path": "data\\service_tickets.csv",
+      "records": 5001,
+      "fields": [
+        "ticket_id",
+        "opened_at",
+        "customer",
+        "device_id",
+        "category",
+        "priority",
+        "sentiment",
+        "resolution_hours",
+        "sla_met",
+        "escalated",
+        "summary"
+      ]
+    },
+    "customer_support_conversations": {
+      "path": "data\\customer_support_conversations.csv",
+      "records": 5001,
+      "fields": [
+        "conversation_id",
+        "timestamp",
+        "customer",
+        "channel",
+        "intent",
+        "turn_count",
+        "sentiment",
+        "contains_pii",
+        "resolved",
+        "transcript_excerpt"
+      ]
+    },
+    "contracts_slas": {
+      "path": "data\\contracts_slas.csv",
+      "records": 5001,
+      "fields": [
+        "contract_id",
+        "customer",
+        "effective_date",
+        "term_months",
+        "sla_uptime_pct",
+        "response_time_hours",
+        "monthly_value_usd",
+        "renewal_risk",
+        "obligation_count",
+        "violation_count"
+      ]
+    },
+    "invoice_processing": {
+      "path": "data\\invoice_processing.csv",
+      "records": 5001,
+      "fields": [
+        "invoice_id",
+        "timestamp",
+        "customer",
+        "amount_usd",
+        "currency",
+        "ocr_confidence",
+        "exception_type",
+        "approval_cycle_hours",
+        "fraud_score"
+      ]
+    },
+    "employee_workflow_logs": {
+      "path": "data\\employee_workflow_logs.csv",
+      "records": 5001,
+      "fields": [
+        "workflow_id",
+        "timestamp",
+        "employee_id",
+        "department",
+        "process",
+        "duration_minutes",
+        "automation_candidate",
+        "rework_count",
+        "policy_exception"
+      ]
+    },
+    "print_job_history": {
+      "path": "data\\print_job_history.csv",
+      "records": 5001,
+      "fields": [
+        "job_id",
+        "timestamp",
+        "device_id",
+        "customer",
+        "user_department",
+        "pages",
+        "color",
+        "duplex",
+        "job_status",
+        "sensitive_doc_detected"
+      ]
+    },
+    "customer_profiles": {
+      "path": "data\\customer_profiles.csv",
+      "records": 5001,
+      "fields": [
+        "customer_id",
+        "customer",
+        "industry",
+        "region",
+        "fleet_size",
+        "annual_contract_value",
+        "ticket_count_90d",
+        "usage_trend",
+        "support_sentiment",
+        "contract_age_months",
+        "churn_probability"
+      ]
+    },
+    "product_catalog": {
+      "path": "data\\product_catalog.csv",
+      "records": 5001,
+      "fields": [
+        "sku",
+        "product_name",
+        "category",
+        "unit_cost_usd",
+        "lead_time_days",
+        "supplier_risk",
+        "stock_on_hand",
+        "reorder_point",
+        "active"
+      ]
+    },
+    "warranty_records": {
+      "path": "data\\warranty_records.csv",
+      "records": 5001,
+      "fields": [
+        "warranty_id",
+        "device_id",
+        "customer",
+        "start_date",
+        "duration_months",
+        "claim_count",
+        "claim_cost_usd",
+        "coverage_level",
+        "expiration_risk"
+      ]
+    },
+    "compliance_audit_logs": {
+      "path": "data\\compliance_audit_logs.csv",
+      "records": 5001,
+      "fields": [
+        "audit_id",
+        "timestamp",
+        "actor_id",
+        "control",
+        "resource",
+        "result",
+        "risk_score",
+        "evidence_uri"
+      ]
+    },
+    "security_events": {
+      "path": "data\\security_events.csv",
+      "records": 5001,
+      "fields": [
+        "security_event_id",
+        "timestamp",
+        "actor_id",
+        "event_type",
+        "source_ip",
+        "severity",
+        "blocked",
+        "pii_detected",
+        "rag_security_score"
+      ]
+    }
+  },
+  "executive_metrics": {
+    "mttr_hours": 14.8,
+    "device_uptime_pct": 98.73,
+    "cost_savings_usd": 4820000,
+    "ticket_resolution_hours": 12.6,
+    "churn_risk_pct": 11.4,
+    "sla_compliance_pct": 96.8,
+    "inventory_health_pct": 91.2,
+    "ai_agent_productivity_pct": 68.5,
+    "forecast_accuracy_pct": 89.7
+  }
+}
