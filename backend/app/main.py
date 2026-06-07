@@ -7,6 +7,7 @@ from fastapi import Depends, FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from . import analytics
 from .agents import orchestrate
 from .copilot import copilot_query
 from .data_quality import dataset_quality_summary
@@ -57,21 +58,50 @@ def health():
 
 @app.get("/metrics/executive")
 def executive_metrics(user: User = Depends(get_current_user)):
-    return {
-        "mttr_hours": 14.8,
-        "device_uptime_pct": 98.73,
-        "cost_savings_usd": 4_820_000,
-        "ticket_resolution_hours": 12.6,
-        "churn_risk_pct": 11.4,
-        "sla_compliance_pct": 96.8,
-        "inventory_health_pct": 91.2,
-        "ai_agent_productivity_pct": 68.5,
-        "forecast_accuracy_pct": 89.7,
-        "role": user.role,
-        "tenant_id": user.tenant_id,
-        "data_freshness": "synthetic-demo-2026-06-08",
-        "governance_status": "model outputs require approval for high-impact decisions",
-    }
+    return analytics.executive_metrics(role=user.role, tenant_id=user.tenant_id)
+
+
+@app.get("/metrics/roi")
+def roi_metrics(user: User = Depends(get_current_user)):
+    """Transparent ROI — annual savings by lever with stated assumptions."""
+    return analytics.roi_summary()
+
+
+@app.get("/sustainability")
+def sustainability(user: User = Depends(get_current_user)):
+    """ESG view — energy, carbon, duplex/color mix, waste from failed jobs."""
+    return analytics.sustainability()
+
+
+@app.get("/document-intelligence")
+def document_intelligence(user: User = Depends(get_current_user)):
+    """Intelligent Document Processing — OCR confidence, exceptions, fraud, STP rate."""
+    return analytics.document_intelligence()
+
+
+@app.get("/responsible-ai")
+def responsible_ai(user: User = Depends(get_current_user)):
+    """Responsible-AI posture — NIST AI RMF + EU AI Act mapping, model cards, compliance, security."""
+    return analytics.responsible_ai()
+
+
+@app.get("/executive-brief")
+def executive_brief(user: User = Depends(get_current_user)):
+    """One-page executive brief generated from live data."""
+    return analytics.executive_brief()
+
+
+class AgenticRequest(BaseModel):
+    device_id: Optional[str] = Field(default=None, max_length=40)
+    governance: GovernanceEnvelope
+
+
+@app.post("/agentic/run")
+def agentic_run(payload: AgenticRequest, user: User = Depends(get_current_user)):
+    """Hero agentic workflow — Sensor -> Inventory -> Forecast -> Procurement (governed) -> Maintenance."""
+    enforce_tenant_scope(user, payload.governance.tenant_id)
+    return analytics.agentic_workflow(device_id=payload.device_id,
+                                      request_id=payload.governance.request_id)
 
 
 # ── Agents ────────────────────────────────────────────────────────────────────

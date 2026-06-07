@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>XEIP — Xerox Enterprise Intelligence Platform</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e8173a'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='14' font-weight='bold' fill='white' text-anchor='middle'%3EX%3C/text%3E%3C/svg%3E"/>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
 
@@ -158,6 +159,14 @@
 
   /* LOADING */
   .loading-row { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; padding:12px 0; }
+  @media print {
+    .sidebar, .topbar { display:none !important; }
+    .main, .content { margin:0 !important; padding:0 !important; }
+    body, .shell { background:#fff !important; color:#000 !important; }
+    .card { border:1px solid #ccc !important; break-inside:avoid; }
+    .kpi-value { color:#000 !important; }
+    .btn { display:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -188,6 +197,23 @@
       </div>
       <div class="nav-item" onclick="showTab('ml',this)">
         <span class="icon">∿</span> ML Models
+      </div>
+
+      <div class="nav-section">Enterprise AI</div>
+      <div class="nav-item" onclick="showTab('agentic',this)">
+        <span class="icon">⚡</span> Agentic Workflow
+      </div>
+      <div class="nav-item" onclick="showTab('docai',this)">
+        <span class="icon">📄</span> Document AI
+      </div>
+      <div class="nav-item" onclick="showTab('sustainability',this)">
+        <span class="icon">🌱</span> Sustainability
+      </div>
+      <div class="nav-item" onclick="showTab('responsible',this)">
+        <span class="icon">⚖</span> Responsible AI
+      </div>
+      <div class="nav-item" onclick="showTab('brief',this)">
+        <span class="icon">▤</span> Executive Brief
       </div>
 
       <div class="nav-section">Operations</div>
@@ -233,6 +259,10 @@
       <div class="tab-panel active" id="tab-overview">
         <div class="kpi-grid" id="kpiGrid">
           <div class="loading-row"><span class="spinner"></span> Loading KPIs…</div>
+        </div>
+        <div class="card" id="roiCard" style="margin-bottom:16px">
+          <div class="card-title">Quantified Business Impact (computed from live data)</div>
+          <div id="roiStrip"><div class="loading-row"><span class="spinner"></span> Computing ROI…</div></div>
         </div>
         <div class="two-col">
           <div class="card">
@@ -526,6 +556,85 @@
         </div>
       </div>
 
+      <!-- AGENTIC WORKFLOW TAB -->
+      <div class="tab-panel" id="tab-agentic">
+        <div class="card">
+          <div class="section-hdr">
+            <span class="section-title">Autonomous Agent Orchestration — live chain over real fleet data</span>
+            <button class="btn btn-primary" onclick="runAgentic()">▶ Run Workflow</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+            Triggered by a low-toner device. Each agent hands off to the next; every step writes a governed audit record.
+            Procurement above the $50K policy ceiling escalates to a human.
+          </div>
+          <div id="agenticTrace"><div class="loading-row"><span class="spinner"></span> Click “Run Workflow” to orchestrate the agent chain…</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Per-Step Audit Trail (API response)</div>
+          <div class="json-out" id="agenticJson" style="height:280px">// Run the workflow to see the full governed trace</div>
+        </div>
+      </div>
+
+      <!-- DOCUMENT AI TAB -->
+      <div class="tab-panel" id="tab-docai">
+        <div class="kpi-grid" id="docaiKpis"><div class="loading-row"><span class="spinner"></span> Loading document intelligence…</div></div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Invoice Exception Breakdown</div>
+            <div id="docaiExceptions"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Model Card — idp_extract_v1</div>
+            <div id="docaiModelCard" style="font-size:12px;color:var(--muted)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUSTAINABILITY TAB -->
+      <div class="tab-panel" id="tab-sustainability">
+        <div class="kpi-grid" id="susKpis"><div class="loading-row"><span class="spinner"></span> Loading ESG metrics…</div></div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Print Mix &amp; Waste</div>
+            <div id="susMix"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Sustainability Recommendations</div>
+            <div id="susRecs" style="font-size:13px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESPONSIBLE AI TAB -->
+      <div class="tab-panel" id="tab-responsible">
+        <div class="kpi-grid" id="raiKpis"><div class="loading-row"><span class="spinner"></span> Loading governance posture…</div></div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title">Framework Alignment</div>
+            <div id="raiFrameworks" style="font-size:12px"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Compliance Audit (live) &amp; Security Posture</div>
+            <div id="raiCompliance"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Model Cards &amp; Controls in Effect</div>
+          <div id="raiModelCards"></div>
+        </div>
+      </div>
+
+      <!-- EXECUTIVE BRIEF TAB -->
+      <div class="tab-panel" id="tab-brief">
+        <div class="card">
+          <div class="section-hdr">
+            <span class="section-title">One-Page Executive Brief</span>
+            <button class="btn btn-primary" onclick="window.print()">🖨 Print / Save PDF</button>
+          </div>
+          <div id="briefBody"><div class="loading-row"><span class="spinner"></span> Generating brief from live data…</div></div>
+        </div>
+      </div>
+
       <!-- ENDPOINTS TAB -->
       <div class="tab-panel" id="tab-endpoints">
         <div class="card">
@@ -564,11 +673,16 @@ function refreshCurrentTab() {
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 const TAB_TITLES = {
-  overview: ['Executive Dashboard', 'Live KPIs · Xerox Enterprise Fleet'],
-  fleet: ['Fleet Monitor', 'Live Device Telemetry · 50 Printers'],
-  copilot: ['AI Executive Copilot', 'Natural Language · Instant Insights'],
+  overview: ['Executive Dashboard', 'Live KPIs · Quantified Impact · Computed from Real Data'],
+  fleet: ['Fleet Monitor', 'Live Device Telemetry · Real Fleet · Highest-Risk First'],
+  copilot: ['AI Executive Copilot', 'Natural Language · Real Data · Instant Insights'],
   agents: ['AI Agent Mesh', '7 Specialist Agents · Governed Orchestration'],
   ml: ['ML Model Lab', 'Live Inference · Sliders · Model Cards'],
+  agentic: ['Agentic Workflow', 'Autonomous Multi-Agent Chain · Governed Audit Trail'],
+  docai: ['Document AI', 'Intelligent Document Processing · OCR · Fraud · STP'],
+  sustainability: ['Sustainability & ESG', 'Energy · Carbon · Waste · Computed from Print History'],
+  responsible: ['Responsible AI', 'NIST AI RMF · EU AI Act · Model Cards · Live Compliance'],
+  brief: ['Executive Brief', 'Auto-Generated One-Pager · Live Data'],
   rag: ['RAG Query Engine', 'Knowledge Base · Permission-Filtered Retrieval'],
   governance: ['Governance & Audit', 'Approval Thresholds · Audit Trail'],
   endpoints: ['API Reference', 'All Endpoints · Auth · Schemas'],
@@ -595,6 +709,11 @@ function loadTab(name) {
   else if (name === 'governance') checkApproval();
   else if (name === 'endpoints') renderEndpoints();
   else if (name === 'agents') renderAgents();
+  else if (name === 'agentic') { /* on demand via button */ }
+  else if (name === 'docai') loadDocAI();
+  else if (name === 'sustainability') loadSustainability();
+  else if (name === 'responsible') loadResponsible();
+  else if (name === 'brief') loadBrief();
 }
 
 // ── API Helper ────────────────────────────────────────────────────────────────
@@ -637,14 +756,14 @@ async function loadOverview() {
   if (data.error) { grid.innerHTML = `<div style="color:var(--accent)">${data.error}</div>`; return; }
 
   const kpis = [
-    { label: 'Device Uptime', value: data.device_uptime_pct + '%', color: 'green', delta: '↑ best in 18mo' },
-    { label: 'MTTR Hours', value: data.mttr_hours + 'h', color: 'yellow', delta: '↓ -12% QoQ' },
-    { label: 'Cost Savings', value: '$' + (data.cost_savings_usd/1e6).toFixed(2) + 'M', color: 'green', delta: 'YTD vs baseline' },
-    { label: 'SLA Compliance', value: data.sla_compliance_pct + '%', color: 'green', delta: '↑ above target' },
-    { label: 'Churn Risk', value: data.churn_risk_pct + '%', color: 'yellow', delta: '142 accounts flagged' },
-    { label: 'Inventory Health', value: data.inventory_health_pct + '%', color: 'green', delta: '3 SKUs low' },
-    { label: 'Ticket Resolution', value: data.ticket_resolution_hours + 'h', color: 'blue', delta: '↓ -18% QoQ' },
-    { label: 'AI Productivity', value: data.ai_agent_productivity_pct + '%', color: 'blue', delta: 'Agent automation' },
+    { label: 'Device Uptime', value: data.device_uptime_pct + '%', color: 'green', delta: 'from telemetry anomaly rate' },
+    { label: 'MTTR Hours', value: data.mttr_hours + 'h', color: 'green', delta: 'mean repair downtime' },
+    { label: 'Est. Annual Savings', value: '$' + (data.cost_savings_usd/1e3).toFixed(0) + 'K', color: 'green', delta: '4 automation levers' },
+    { label: 'SLA Compliance', value: data.sla_compliance_pct + '%', color: data.sla_compliance_pct>=85?'green':'yellow', delta: data.ticket_count.toLocaleString()+' tickets' },
+    { label: 'Churn Risk', value: data.churn_risk_pct + '%', color: 'yellow', delta: data.churn_accounts_flagged.toLocaleString()+' accounts flagged' },
+    { label: 'Inventory Health', value: data.inventory_health_pct + '%', color: data.inventory_health_pct>=85?'green':'yellow', delta: data.skus_below_reorder.toLocaleString()+' SKUs low' },
+    { label: 'Ticket Resolution', value: data.ticket_resolution_hours + 'h', color: 'blue', delta: 'mean across fleet' },
+    { label: 'Automation Potential', value: data.ai_automation_potential_pct + '%', color: 'blue', delta: 'workflows auto-eligible' },
   ];
   grid.innerHTML = kpis.map(k => `
     <div class="kpi-card">
@@ -652,6 +771,8 @@ async function loadOverview() {
       <div class="kpi-value ${k.color}">${k.value}</div>
       <div class="kpi-delta">${k.delta}</div>
     </div>`).join('');
+
+  loadRoiStrip(data);
 
   document.getElementById('agentPerf').innerHTML = `
     ${[
@@ -668,6 +789,171 @@ async function loadOverview() {
         </div>
         <div class="progress-bar"><div class="progress-fill ${score>80?'green':score>70?'yellow':'red'}" style="width:${score}%"></div></div>
       </div>`).join('')}`;
+}
+
+// ── Reusable KPI card renderer ──────────────────────────────────────────────
+function kpiCards(arr) {
+  return arr.map(k => `<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value ${k.color||'blue'}">${k.value}</div>${k.delta?`<div class="kpi-delta">${k.delta}</div>`:''}</div>`).join('');
+}
+
+// ── ROI strip (Overview) ────────────────────────────────────────────────────
+async function loadRoiStrip(metrics) {
+  const el = document.getElementById('roiStrip');
+  const roi = await apiFetch('GET', '/metrics/roi');
+  if (roi.error) { el.innerHTML = `<div style="color:var(--accent)">${roi.error}</div>`; return; }
+  const bars = roi.levers.map(l => {
+    const pctOfTotal = roi.total_annual_savings_usd ? Math.round(100*l.annual_usd/roi.total_annual_savings_usd) : 0;
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px">${l.lever}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--green)">$${l.annual_usd.toLocaleString()}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill green" style="width:${pctOfTotal}%"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px">${l.basis} — <em>${l.assumption}</em></div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="font-size:30px;font-weight:700;color:var(--green);font-family:var(--mono)">$${roi.total_annual_savings_usd.toLocaleString()}</div>
+      <div style="font-size:12px;color:var(--muted)">estimated annual value · ${roi.downtime_hours_avoided.toLocaleString()}h downtime avoided</div>
+    </div>
+    ${bars}
+    <div style="font-size:11px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border);padding-top:8px">${roi.methodology}</div>`;
+}
+
+// ── Agentic Workflow ────────────────────────────────────────────────────────
+const STATUS_COLOR = { low:'badge-red', approval:'badge-yellow', auto:'badge-green', ok:'badge-blue' };
+const STATUS_LABEL = { low:'ATTENTION', approval:'HUMAN APPROVAL', auto:'AUTONOMOUS', ok:'OK' };
+
+async function runAgentic() {
+  const trace = document.getElementById('agenticTrace');
+  trace.innerHTML = '<div class="loading-row"><span class="spinner"></span> Orchestrating agent chain over live data…</div>';
+  const data = await apiFetch('POST', '/agentic/run', {
+    governance: { request_id: 'ui-wf-' + Date.now(), tenant_id: 'demo-tenant' }
+  });
+  document.getElementById('agenticJson').innerHTML = syntaxHL(data);
+  if (data.error) { trace.innerHTML = `<div style="color:var(--accent)">${data.error}</div>`; return; }
+
+  const banner = data.human_approval_required
+    ? `<div style="padding:10px 14px;border-radius:6px;background:rgba(232,23,58,.08);border:1px solid var(--accent);color:var(--accent);font-weight:600;margin-bottom:14px">⚠ Workflow paused — human approval required (order $${data.order_value_usd.toLocaleString()} exceeds policy ceiling)</div>`
+    : `<div style="padding:10px 14px;border-radius:6px;background:rgba(34,197,94,.06);border:1px solid var(--green);color:var(--green);font-weight:600;margin-bottom:14px">✓ Completed autonomously — ${data.agents_invoked.length} agents · policy ${data.policy}</div>`;
+
+  const steps = data.steps.map((s, i) => `
+    <div style="display:flex;gap:14px;margin-bottom:6px">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="font-size:22px">${s.icon}</div>
+        ${i < data.steps.length-1 ? '<div style="flex:1;width:2px;background:var(--border);margin:4px 0"></div>' : ''}
+      </div>
+      <div style="flex:1;padding-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:600;font-size:13px">${s.agent}</span>
+          <span class="badge ${STATUS_COLOR[s.status]||'badge-blue'}">${STATUS_LABEL[s.status]||s.status}</span>
+        </div>
+        <div style="font-size:12px;margin-top:2px">${s.action}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${s.finding}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">audit · ${s.audit.decision} · risk ${s.audit.risk_score} · ${s.audit.evidence.join(', ')}</div>
+      </div>
+    </div>`).join('');
+  trace.innerHTML = banner + `<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Trigger: <strong>${data.trigger}</strong> · device ${data.device_id}</div>` + steps;
+}
+
+// ── Document AI ─────────────────────────────────────────────────────────────
+async function loadDocAI() {
+  const data = await apiFetch('GET', '/document-intelligence');
+  const grid = document.getElementById('docaiKpis');
+  if (data.error) { grid.innerHTML = `<div style="color:var(--accent)">${data.error}</div>`; return; }
+  grid.innerHTML = kpiCards([
+    { label:'Invoices', value:data.total_invoices.toLocaleString(), color:'blue' },
+    { label:'Total Value', value:'$'+(data.total_value_usd/1e6).toFixed(1)+'M', color:'blue' },
+    { label:'Straight-Through', value:data.straight_through_pct+'%', color:'green', delta:data.straight_through_count.toLocaleString()+' touchless' },
+    { label:'Avg OCR Conf.', value:(data.avg_ocr_confidence*100).toFixed(1)+'%', color:'green' },
+    { label:'Exception Rate', value:data.exception_rate_pct+'%', color:'yellow' },
+    { label:'Fraud Flags', value:data.high_fraud_flags, color:data.high_fraud_flags>0?'red':'green' },
+    { label:'Avg Approval', value:data.avg_approval_cycle_hours+'h', color:'blue' },
+    { label:'Touchless Savings', value:'$'+data.annual_touchless_savings_usd.toLocaleString(), color:'green', delta:'per year' },
+  ]);
+  const total = Object.values(data.exception_breakdown).reduce((a,b)=>a+b,0);
+  document.getElementById('docaiExceptions').innerHTML = Object.entries(data.exception_breakdown)
+    .sort((a,b)=>b[1]-a[1]).map(([k,v])=>{
+      const pct = Math.round(100*v/total);
+      const color = k==='none'?'green':'yellow';
+      return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px">${k}</span><span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${v.toLocaleString()} (${pct}%)</span></div><div class="progress-bar"><div class="progress-fill ${color}" style="width:${pct}%"></div></div></div>`;
+    }).join('');
+  const mc = data.model_card;
+  document.getElementById('docaiModelCard').innerHTML =
+    `<div style="margin-bottom:8px"><strong style="color:var(--text)">${mc.model}</strong></div>
+     <div style="margin-bottom:6px"><span style="color:var(--text)">Inputs:</span> ${mc.inputs.join(', ')}</div>
+     <div style="margin-bottom:6px"><span style="color:var(--text)">Human oversight:</span> ${mc.human_oversight}</div>
+     <div><span style="color:var(--text)">Limitations:</span> ${mc.limitations}</div>`;
+}
+
+// ── Sustainability ──────────────────────────────────────────────────────────
+async function loadSustainability() {
+  const data = await apiFetch('GET', '/sustainability');
+  const grid = document.getElementById('susKpis');
+  if (data.error) { grid.innerHTML = `<div style="color:var(--accent)">${data.error}</div>`; return; }
+  grid.innerHTML = kpiCards([
+    { label:'Print Jobs', value:data.total_print_jobs.toLocaleString(), color:'blue' },
+    { label:'Total Pages', value:data.total_pages.toLocaleString(), color:'blue' },
+    { label:'Energy', value:data.energy_kwh.toLocaleString()+' kWh', color:'yellow' },
+    { label:'Carbon', value:data.carbon_tonnes_co2e+' t', color:'yellow', delta:'CO₂e' },
+    { label:'Duplex Rate', value:data.duplex_rate_pct+'%', color:data.duplex_rate_pct>=60?'green':'yellow' },
+    { label:'Color Jobs', value:data.color_pct+'%', color:'blue' },
+    { label:'Failed/Cancelled', value:data.failed_cancelled_jobs.toLocaleString(), color:'red', delta:data.wasted_pages_failed_jobs.toLocaleString()+' pages wasted' },
+    { label:'Sheets Saveable', value:data.potential_sheets_saved_duplex.toLocaleString(), color:'green', delta:data.potential_carbon_saved_kg.toLocaleString()+' kg CO₂e' },
+  ]);
+  document.getElementById('susMix').innerHTML = [
+    ['Mono', data.mono_pct, 'blue'], ['Color', data.color_pct, 'yellow'], ['Duplex adoption', data.duplex_rate_pct, 'green'],
+  ].map(([n,v,c])=>`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px">${n}</span><span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${v}%</span></div><div class="progress-bar"><div class="progress-fill ${c}" style="width:${v}%"></div></div></div>`).join('');
+  document.getElementById('susRecs').innerHTML = data.recommendations.map(r=>`<div style="display:flex;gap:8px;margin-bottom:10px"><span style="color:var(--green)">▸</span><span style="color:var(--muted)">${r}</span></div>`).join('');
+}
+
+// ── Responsible AI ──────────────────────────────────────────────────────────
+async function loadResponsible() {
+  const data = await apiFetch('GET', '/responsible-ai');
+  const grid = document.getElementById('raiKpis');
+  if (data.error) { grid.innerHTML = `<div style="color:var(--accent)">${data.error}</div>`; return; }
+  const ca = data.compliance_audit, sp = data.security_posture, wr = data.warranty_risk;
+  grid.innerHTML = kpiCards([
+    { label:'Compliance Checks', value:ca.total_checks.toLocaleString(), color:'blue' },
+    { label:'Pass Rate', value:ca.pass_rate_pct+'%', color:ca.pass_rate_pct>=80?'green':'yellow' },
+    { label:'Failed Checks', value:ca.fail.toLocaleString(), color:'red' },
+    { label:'Security Events', value:sp.total_events.toLocaleString(), color:'blue' },
+    { label:'Threats Blocked', value:sp.blocked.toLocaleString(), color:'green' },
+    { label:'Injections Blocked', value:sp.prompt_injection_blocked.toLocaleString()+'/'+sp.prompt_injection_attempts.toLocaleString(), color:'green' },
+    { label:'PII Detections', value:sp.pii_detections.toLocaleString(), color:'yellow' },
+    { label:'Warranty Risk', value:wr.high_expiration_risk.toLocaleString(), color:'yellow', delta:wr.high_risk_pct+'% high risk' },
+  ]);
+  document.getElementById('raiFrameworks').innerHTML = data.frameworks.map(f=>{
+    const rows = Object.entries(f.functions||f.controls).map(([k,v])=>`<div style="margin-bottom:6px"><span style="color:var(--text);font-weight:600">${k}:</span> <span style="color:var(--muted)">${v}</span></div>`).join('');
+    return `<div style="margin-bottom:14px"><div class="badge badge-green" style="margin-bottom:8px">${f.name}</div>${rows}</div>`;
+  }).join('');
+  document.getElementById('raiCompliance').innerHTML = Object.entries(ca.by_control).map(([c,r])=>{
+    const tot = r.pass+r.warning+r.fail; const pp = Math.round(100*r.pass/tot);
+    return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px">${c}</span><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${pp}% pass · ${r.fail} fail</span></div><div class="progress-bar"><div class="progress-fill ${pp>=85?'green':pp>=70?'yellow':'red'}" style="width:${pp}%"></div></div></div>`;
+  }).join('');
+  document.getElementById('raiModelCards').innerHTML =
+    `<div style="margin-bottom:12px"><span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Controls in effect</span><div style="margin-top:6px">${data.controls_in_effect.map(c=>`<span class="agent-tag">${c}</span>`).join(' ')}</div></div>
+     <div class="table-wrap"><table><thead><tr><th>Model</th><th>Purpose</th><th>Human oversight</th><th>Limitation</th></tr></thead><tbody>
+     ${data.model_cards.map(m=>`<tr><td style="font-family:var(--mono);font-size:11px">${m.model}</td><td style="font-size:12px">${m.purpose}</td><td style="font-size:11px;color:var(--muted)">${m.human_oversight}</td><td style="font-size:11px;color:var(--muted)">${m.limitation}</td></tr>`).join('')}
+     </tbody></table></div>`;
+}
+
+// ── Executive Brief ─────────────────────────────────────────────────────────
+async function loadBrief() {
+  const data = await apiFetch('GET', '/executive-brief');
+  const el = document.getElementById('briefBody');
+  if (data.error) { el.innerHTML = `<div style="color:var(--accent)">${data.error}</div>`; return; }
+  const kpiRows = Object.entries(data.kpis).map(([k,v])=>`<div class="kpi-card"><div class="kpi-label">${k}</div><div class="kpi-value blue">${v}</div></div>`).join('');
+  el.innerHTML = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Generated ${data.generated}</div>
+    <div style="font-size:14px;margin-bottom:16px">${data.headline}</div>
+    <div class="kpi-grid" style="margin-bottom:18px">${kpiRows}</div>
+    <div class="two-col">
+      <div><div class="card-title">Key Wins</div>${data.wins.map(w=>`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:13px"><span style="color:var(--green)">✓</span><span>${w}</span></div>`).join('')}</div>
+      <div><div class="card-title">Open Risks</div>${data.risks.map(r=>`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:13px"><span style="color:var(--accent)">!</span><span>${r}</span></div>`).join('')}</div>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)"><strong style="color:var(--text)">Governance:</strong> ${data.governance}</div>`;
 }
 
 // ── Fleet ─────────────────────────────────────────────────────────────────────
@@ -888,7 +1174,13 @@ function checkApproval() {
 // ── Endpoints ─────────────────────────────────────────────────────────────────
 const ENDPOINTS = [
   { method:'GET',  path:'/health',               desc:'Health check',                   perm:'public' },
-  { method:'GET',  path:'/metrics/executive',     desc:'Executive KPI dashboard',        perm:'authenticated' },
+  { method:'GET',  path:'/metrics/executive',     desc:'Executive KPIs (computed from CSVs)', perm:'authenticated' },
+  { method:'GET',  path:'/metrics/roi',           desc:'ROI by lever with assumptions',  perm:'authenticated' },
+  { method:'GET',  path:'/sustainability',        desc:'ESG — energy, carbon, waste',    perm:'authenticated' },
+  { method:'GET',  path:'/document-intelligence', desc:'IDP — OCR, exceptions, fraud, STP', perm:'authenticated' },
+  { method:'GET',  path:'/responsible-ai',        desc:'NIST/EU AI Act, model cards, compliance', perm:'authenticated' },
+  { method:'GET',  path:'/executive-brief',       desc:'One-page brief from live data',  perm:'authenticated' },
+  { method:'POST', path:'/agentic/run',           desc:'Hero agentic workflow (governed chain)', perm:'authenticated' },
   { method:'GET',  path:'/fleet/live',            desc:'Live fleet telemetry (50 devices)', perm:'ml:score' },
   { method:'GET',  path:'/fleet/stats',           desc:'Fleet aggregated health stats',  perm:'ml:score' },
   { method:'POST', path:'/copilot/query',         desc:'Executive AI copilot NL query',  perm:'authenticated' },
