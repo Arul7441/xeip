@@ -30,6 +30,8 @@ from .security import User, get_current_user, rate_limit, security_headers
 from .workflows import run_low_toner_workflow
 
 app = FastAPI(title="XEIP Enterprise Intelligence API", version="2.0.0")
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
 @app.middleware("http")
