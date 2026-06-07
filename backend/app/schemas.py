@@ -46,6 +46,20 @@ class ChurnInput(BaseModel):
     contract_age: int = Field(..., ge=0, le=240)
 
 
+class TicketRoutingInput(BaseModel):
+    summary: str = Field(..., min_length=5, max_length=1000)
+    priority: Literal["P1", "P2", "P3", "P4"] = "P3"
+    sentiment: float = Field(default=0, ge=-1, le=1)
+    device_error_count: int = Field(default=0, ge=0, le=10_000)
+
+
+class AnomalyInput(BaseModel):
+    failed_login_count: int = Field(default=0, ge=0, le=100_000)
+    unusual_location: bool = False
+    after_hours_access: bool = False
+    data_volume_mb: float = Field(default=0, ge=0, le=1_000_000)
+
+
 class InventoryInput(BaseModel):
     daily_usage: list[float] = Field(..., min_length=3, max_length=365)
     horizon_days: int = Field(default=30, ge=1, le=365)
@@ -60,3 +74,9 @@ class LowTonerWorkflowRequest(BaseModel):
     horizon_days: int = Field(default=30, ge=1, le=365)
     governance: GovernanceEnvelope
 
+
+class WorkOrderRequest(BaseModel):
+    device_id: str = Field(..., min_length=3, max_length=80)
+    issue: str = Field(..., min_length=8, max_length=1000)
+    priority: Literal["P1", "P2", "P3", "P4"] = "P3"
+    governance: GovernanceEnvelope

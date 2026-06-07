@@ -8,9 +8,19 @@ from fastapi.responses import JSONResponse
 from .agents import orchestrate
 from .data_quality import dataset_quality_summary
 from .governance import enforce_tenant_scope, require_permission
-from .ml import predict_churn, predict_failure, predict_inventory
+from .ml import detect_anomaly, predict_churn, predict_failure, predict_inventory, route_ticket
 from .rag import answer_with_sources
-from .schemas import AgentRequest, ChurnInput, FailureInput, InventoryInput, LowTonerWorkflowRequest, RagQuery
+from .schemas import (
+    AgentRequest,
+    AnomalyInput,
+    ChurnInput,
+    FailureInput,
+    InventoryInput,
+    LowTonerWorkflowRequest,
+    RagQuery,
+    TicketRoutingInput,
+    WorkOrderRequest,
+)
 from .security import User, get_current_user, rate_limit, security_headers
 from .workflows import run_low_toner_workflow
 
@@ -60,6 +70,11 @@ def agent_orchestrate(request: AgentRequest, user: User = Depends(get_current_us
     return orchestrate(request, user)
 
 
+@app.post("/chat")
+def chat(request: AgentRequest, user: User = Depends(get_current_user)):
+    return orchestrate(request, user)
+
+
 @app.post("/rag/query")
 def rag_query(payload: RagQuery, user: User = Depends(get_current_user)):
     enforce_tenant_scope(user, payload.governance.tenant_id)
@@ -72,8 +87,20 @@ def ml_failure(payload: FailureInput, user: User = Depends(get_current_user)):
     return predict_failure(payload)
 
 
+@app.post("/predict-failure")
+def predict_failure_alias(payload: FailureInput, user: User = Depends(get_current_user)):
+    require_permission(user, "ml:score")
+    return predict_failure(payload)
+
+
 @app.post("/ml/churn")
 def ml_churn(payload: ChurnInput, user: User = Depends(get_current_user)):
+    require_permission(user, "ml:score")
+    return predict_churn(payload)
+
+
+@app.post("/predict-churn")
+def predict_churn_alias(payload: ChurnInput, user: User = Depends(get_current_user)):
     require_permission(user, "ml:score")
     return predict_churn(payload)
 
@@ -84,9 +111,59 @@ def ml_inventory(payload: InventoryInput, user: User = Depends(get_current_user)
     return predict_inventory(payload)
 
 
+@app.post("/forecast-toner")
+def forecast_toner(payload: InventoryInput, user: User = Depends(get_current_user)):
+    require_permission(user, "ml:score")
+    return predict_inventory(payload)
+
+
+@app.post("/route-ticket")
+def route_ticket_endpoint(payload: TicketRoutingInput, user: User = Depends(get_current_user)):
+    require_permission(user, "ml:score")
+    return route_ticket(payload)
+
+
+@app.post("/detect-anomaly")
+def detect_anomaly_endpoint(payload: AnomalyInput, user: User = Depends(get_current_user)):
+    require_permission(user, "ml:score")
+    return detect_anomaly(payload)
+
+
 @app.post("/workflows/low-toner")
 def low_toner(payload: LowTonerWorkflowRequest, user: User = Depends(get_current_user)):
     return run_low_toner_workflow(payload, user)
+
+
+@app.post("/create-workorder")
+def create_workorder(payload: WorkOrderRequest, user: User = Depends(get_current_user)):
+    enforce_tenant_scope(user, payload.governance.tenant_id)
+    require_permission(user, "workflow:run")
+    return {
+        "workorder_id": f"WO-{payload.device_id.upper()}-2026-0001",
+        "device_id": payload.device_id,
+        "priority": payload.priority,
+        "status": "created",
+        "assignment": "field_maintenance" if payload.priority in {"P1", "P2"} else "standard_support",
+        "governance": {
+            "request_id": payload.governance.request_id,
+            "tenant_id": payload.governance.tenant_id,
+            "policy": "XEIP-WORKFLOW-001",
+        },
+    }
+
+
+@app.post("/analyze-contract")
+def analyze_contract(payload: RagQuery, user: User = Depends(get_current_user)):
+    enforce_tenant_scope(user, payload.governance.tenant_id)
+    require_permission(user, "contract:read")
+    result = answer_with_sources(payload, user)
+    return {
+        "contract_analysis": result["answer"],
+        "sla_risk": "high" if "99.5" in result["answer"] else "needs_review",
+        "sources": result["sources"],
+        "confidence": result["confidence"],
+        "audit": result["audit"],
+    }
 
 
 @app.get("/data-quality")

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -20,7 +20,7 @@ def audit_event(
     evidence: list[str] | None = None,
 ) -> dict[str, Any]:
     event = {
-        "timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "timestamp": datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "request_id": request_id,
         "tenant_id": tenant_id,
         "actor": actor,
@@ -42,4 +42,3 @@ def system_trace(request_id: str, controls: list[str], warnings: list[str] | Non
         "warnings": warnings or [],
         "trace_retention": "90d-hot/7y-cold",
     }
-

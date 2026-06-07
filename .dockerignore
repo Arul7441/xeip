@@ -1,0 +1,10 @@
+.git
+backend/.venv
+**/__pycache__
+**/*.pyc
+backend/.pytest_cache
+node_modules
+frontend/.next
+outputs
+*.egg-info
+backend/test.json

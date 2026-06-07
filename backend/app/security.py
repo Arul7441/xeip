@@ -3,8 +3,10 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass
+from os import getenv
 
 from fastapi import Header, HTTPException, Request
+from jose import JWTError, jwt
 
 
 @dataclass
@@ -31,12 +33,42 @@ def get_current_user(authorization: str | None = Header(default=None)) -> User:
     if not authorization:
         raise HTTPException(status_code=401, detail="Authorization required")
     token = authorization.replace("Bearer ", "")
+    if token.startswith("demo."):
+        return _demo_user(token)
+    return _jwt_user(token)
+
+
+def _demo_user(token: str) -> User:
     parts = token.split(".")
     role = parts[-1] if parts else ""
     tenant_id = parts[-2] if len(parts) >= 2 else "demo-tenant"
     if role not in ROLE_PERMISSIONS:
         raise HTTPException(status_code=403, detail="Unknown role")
     return User(subject="demo-user", role=role, permissions=ROLE_PERMISSIONS[role], tenant_id=tenant_id)
+
+
+def _jwt_user(token: str) -> User:
+    secret = getenv("JWT_SECRET", "xeip-local-dev-secret")
+    issuer = getenv("JWT_ISSUER")
+    audience = getenv("JWT_AUDIENCE")
+    options = {"verify_aud": bool(audience), "verify_iss": bool(issuer)}
+    try:
+        claims = jwt.decode(
+            token,
+            secret,
+            algorithms=["HS256"],
+            audience=audience,
+            issuer=issuer,
+            options=options,
+        )
+    except JWTError as exc:
+        raise HTTPException(status_code=401, detail="Invalid JWT") from exc
+    role = claims.get("role")
+    tenant_id = claims.get("tenant_id")
+    subject = claims.get("sub", "jwt-user")
+    if role not in ROLE_PERMISSIONS or not tenant_id:
+        raise HTTPException(status_code=403, detail="JWT missing valid role or tenant")
+    return User(subject=subject, role=role, permissions=ROLE_PERMISSIONS[role], tenant_id=tenant_id)
 
 
 def rate_limit(request: Request) -> None:
